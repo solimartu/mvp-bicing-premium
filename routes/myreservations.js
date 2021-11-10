@@ -21,9 +21,10 @@ router.post("/", async function (req, res, next) {
       ReturnTime,
       userId,
       PathName,
+      Favourite,
     } = req.body;
 
-    const query = `INSERT INTO myreservations (PickUpStation, PickUpTime, ReturnStation, ReturnTime, userId, PathName) VALUES ("${PickUpStation}","${PickUpTime}","${ReturnStation}","${ReturnTime}","${userId}","${PathName}");`;
+    const query = `INSERT INTO myreservations (PickUpStation, PickUpTime, ReturnStation, ReturnTime, userId, PathName, Favourite) VALUES ("${PickUpStation}","${PickUpTime}","${ReturnStation}","${ReturnTime}","${userId}","${PathName}", 0);`;
 
     console.log(query);
 
@@ -55,6 +56,18 @@ router.put("/:id", async function (req, res, next) {
     const results = await db(`SELECT * FROM myreservations;`);
     // console.log("this is the data:", data);
     res.send(results);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+router.get("/favourites", async function (req, res, next) {
+  try {
+    const results = await db(
+      `SELECT * FROM myreservations WHERE Favourite = 1;`
+    );
+
+    res.send(results.data);
   } catch (err) {
     res.status(500).send(err);
   }
