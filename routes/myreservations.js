@@ -16,15 +16,16 @@ router.post("/", async function (req, res, next) {
   try {
     const {
       PickUpStation,
-      PickUpTime,
       ReturnStation,
-      ReturnTime,
       userId,
       PathName,
       Favourite,
+      picktime,
+      retime,
+      daysrange,
     } = req.body;
 
-    const query = `INSERT INTO myreservations (PickUpStation, PickUpTime, ReturnStation, ReturnTime, userId, PathName, Favourite) VALUES ("${PickUpStation}","${PickUpTime}","${ReturnStation}","${ReturnTime}","${userId}","${PathName}", 0);`;
+    const query = `INSERT INTO myreservations (PickUpStation, ReturnStation, userId, PathName, Favourite, picktime, retime, daysrange) VALUES ("${PickUpStation}","${ReturnStation}","${userId}","${PathName}", 0, "${picktime}", "${retime}", "${daysrange}");`;
 
     console.log(query);
 

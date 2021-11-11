@@ -57,6 +57,7 @@ export default function Reservations() {
           <thead>
             <tr>
               <th scope="col">PathName</th>
+              <th scope="col">Days Range</th>
               <th scope="col">Pick Up Station</th>
               <th scope="col">Pick Up Time</th>
               <th scope="col">Return Station</th>
@@ -69,34 +70,53 @@ export default function Reservations() {
               reservations.map((reservation) => (
                 <tr key={reservation.id}>
                   <th scope="row">{reservation.PathName}</th>
+                  <td>{reservation.daysrange}</td>
                   <td>{reservation.PickUpStation}</td>
-                  <td>{reservation.PickUpTime}</td>
+                  <td>{reservation.picktime}</td>
                   <td>{reservation.ReturnStation}</td>
-                  <td>{reservation.ReturnTime}</td>
-                  <td>
-                    {reservation.Favourite}
-                    <button
-                      onClick={() => deleteReservation(reservation)}
-                      className="btn btnx btn-sm btn-danger mr-1"
-                    >
-                      x
-                    </button>
+                  <td>{reservation.retime}</td>
+                  <td className="row align-center">
+                    <div class="col">{reservation.Favourite}</div>
+                    <div class="col">
+                      <button
+                        onClick={() => deleteReservation(reservation)}
+                        className="btn btnx btn-sm btn-danger mb-2"
+                      >
+                        x
+                      </button>
+                    </div>
+                    <div class="col">
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          onClick={() => setToFavourite(reservation)}
+                          className={
+                            reservation.Favourite
+                              ? "bg-primary"
+                              : "bg-secondary"
+                          }
+                        />
+                        <span className="slider round"></span>
+                      </label>
+                    </div>
+
                     {/* <button
                       onClick={() => setToFavourite(reservation)}
                       className="btn btn-sm btn-outline-warning"
                     >
                       F
                     </button> */}
-                    <label className="switch">
+                    {/* <div className="form-check form-switch">
                       <input
                         type="checkbox"
                         onClick={() => setToFavourite(reservation)}
-                        className={
-                          reservation.Favourite ? "bg-primary" : "bg-secondary"
-                        }
+                        // className={
+                        //   reservation.Favourite ? "form-check-input" : "bg-secondary"
+                        // }
+                        className="form-check-input"
+                        id="flexSwitchCheckDefault"
                       />
-                      <span className="slider round"></span>
-                    </label>
+                    </div> */}
                   </td>
                 </tr>
               ))}

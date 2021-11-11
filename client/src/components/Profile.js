@@ -22,16 +22,16 @@ export default function Profile() {
           <h5 className="text-left">{user.firstName}</h5>
           <h5 className="text-left">{user.lastName}</h5>
           <h5 className="text-left text-warning">{user.userName}</h5>
+          <div className="row d-flex mb-3 btn-group">
+            <Link to="/reservations" className="btn btn-md btn-danger me-2">
+              My Reservations
+            </Link>
+            <Link to="/new" className="btn btn-md btn-danger">
+              Add a new reservation
+            </Link>
+          </div>
         </div>
       </section>
-      <div className="row d-flex mb-3">
-        <Link to="/reservations" className="btn btn-md btn-dark m-auto">
-          My Reservations
-        </Link>
-        <Link to="/new" className="btn btn-md btn-dark m-auto">
-          Add a new reservation
-        </Link>
-      </div>
 
       <Outlet />
     </div>
