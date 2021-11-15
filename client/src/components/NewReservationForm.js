@@ -3,9 +3,8 @@ import "react-date-range/dist/styles.css"; // main style file for the calendar
 import "react-date-range/dist/theme/default.css"; // theme css file for the calendar
 import { DateRange } from "react-date-range"; // library for the calendar
 import { addDays } from "date-fns"; // library for the calendar
-import { Map, Marker, ZoomControl } from "pigeon-maps"; // library to display the map
-import bicistations from "./bicistations.json"; // a list with all the bike stations in Barcelona
 
+import BiciPoint from "./BiciPoint";
 
 export default function NewReservationForm() {
   //useEffect to display the favourites into a select list
@@ -13,14 +12,14 @@ export default function NewReservationForm() {
     getFavourites();
   }, []);
 
-// the function to get the favourites from the DB
+  // the function to get the favourites from the DB
   const getFavourites = () => {
     fetch("/myreservations/favourites")
       .then((response) => response.json())
       .then((favourites) => setFavs(favourites))
       .catch((error) => setError(error));
   };
-  
+
   // my DB data
   let [newReservation, setNewReservation] = useState({
     PickUpStation: "",
@@ -49,7 +48,7 @@ export default function NewReservationForm() {
     daysrange,
   } = newReservation;
 
-// to set the range of days from the calendar
+  // to set the range of days from the calendar
   const [daysOfWeek, setDaysOfWeek] = useState({
     selection: {
       startDate: new Date(),
@@ -58,11 +57,7 @@ export default function NewReservationForm() {
     },
   });
 
-// to put color to the marker for the map
-const [hue, setHue] = useState(0);
-const color = `hsl(${hue % 354}deg 70% 54%)`
-
-// every time that i put something on the inputs i see the changes. The range of days is to translate data from the calendar. I need to improve that showing just the days like (TUESDAY TO FRIDAY)
+  // every time that i put something on the inputs i see the changes. The range of days is to translate data from the calendar. I need to improve that showing just the days like (TUESDAY TO FRIDAY)
   const handleChange = (e) => {
     const value = e.target.value;
     const name = e.target.name;
@@ -74,7 +69,7 @@ const color = `hsl(${hue % 354}deg 70% 54%)`
     }));
   };
 
-//my function to add a new reservation after filling the fields (path name, the range in the calendar, starting point and time, ending point and time)
+  //my function to add a new reservation after filling the fields (path name, the range in the calendar, starting point and time, ending point and time)
   const addNewReservation = async (event) => {
     event.preventDefault();
     try {
@@ -85,37 +80,30 @@ const color = `hsl(${hue % 354}deg 70% 54%)`
       });
       if (!res.ok) throw new Error("There was an error");
       const data = await res.json();
-      } catch (err) {
+    } catch (err) {
       console.log(err);
     }
   };
-  
+
   // the function to click a station and add its name into the input below
-  const handleClickOnMap = (bici) => {
+  const handleClickOnMap = (bici, name) => {
     const nameDeStation = bici.name;
     setNewReservation((state) => ({
       ...state,
-      PickUpStation: nameDeStation,
+      [name]: nameDeStation,
     }));
-   };
-// the function to click a station and add its name into the input below (2) --i know i need to create a component, wait for it--
-   const handleClickOnMap2 = (bici) => {
-    const nameDeStation = bici.name;
-    setNewReservation((state) => ({
-      ...state,
-      ReturnStation: nameDeStation,
-    }));
-   }
+  };
 
   return (
     <div className="container">
       <form
         onSubmit={(e) => addNewReservation(e)}
-        className=" row d-flex bg-dark rounded border text-white p-3"
+        className=" row d-flex bg-dark rounded border text-white p-3 justify-content-center"
       >
-        <div className="col-6">
+        <div className="col-4">
           <div className="d-flex flex-column justify-content-center">
-            Add a name to your everyday path:
+            <h6 className="intro">Let's fill it!</h6>
+            <p className="m-0 pb-1">Add a name to your everyday path:</p>
             <input
               name="PathName"
               value={PathName}
@@ -124,14 +112,14 @@ const color = `hsl(${hue % 354}deg 70% 54%)`
               className="text-center rounded m-auto"
             ></input>
           </div>
-          <div className="d-flex flex-column justify-content-center">
-            Or select one of your favs
-            <select value={Favourite} className="m-auto mt-2 mb-2">
-              {favs.length>0 &&
+          <div className="d-flex flex-column justify-content-center pt-1">
+            <p className="m-0 pb-1">Or select one of your favs</p>
+            <select value={Favourite} className="m-auto mb-2">
+              {favs.length > 0 &&
                 favs.map((fav) => <option key={fav.id}>{fav.PathName}</option>)}
             </select>
           </div>
-          <div className="mt-2">
+          <div className="mt-4">
             How often do you need a bike for this path?
             <p>
               <small>-PLEASE SELECT A RANGE IN THE WEEK-</small>
@@ -145,76 +133,48 @@ const color = `hsl(${hue % 354}deg 70% 54%)`
               maxDate={addDays(new Date(), 10)}
               className="rounded"
               showDateDisplay={false}
-              rangeColors={["#dc3545", "#ffc107", "#fd7e14"]}></DateRange> //the calendar
+              rangeColors={["#dc3545", "#ffc107", "#fd7e14"]}
+            ></DateRange>
           </div>
         </div>
 
-        <div className="col-6 d-flex flex-column pb-2">
-          <div className="rounded mb-3 p-3 bg-danger text-white d-flex flex-column">
+        <div className="col-4 d-flex flex-column pb-2">
+          <BiciPoint
+            handleClickOnMap={(bici) => handleClickOnMap(bici, "PickUpStation")}
+            handleChange={handleChange}
+            station={PickUpStation}
+            time={picktime}
+            name="picktime"
+            stationName="PickUpStation"
+          >
             <h5 className="">Starting point</h5>
-            {/* <div className="row">
-                <div className="col-6"> */}
-            Which is your nearest station to start your trip?
-            <div>
-              <Map height={300} defaultCenter={[41.390, 2.154]} defaultZoom={11}><ZoomControl />
-                {bicistations.map((bici) => (
-                <Marker width={15} anchor={[+bici.lat,+bici.lon]} color={color} onClick={() =>handleClickOnMap(bici)} key={bici.id}/>))}
-              </Map>
-            </div>
-            <input
-              name="PickUpStation"
-              value={PickUpStation}
-              onChange={(e) => handleChange(e)}
-              className="text-center mt-1 "
-              placeholder="Click on a Station and it will give you the address"
-            ></input>
-            What time are you used to grab your bike?
-            <input
-              type="time"
-              className="text-center mt-1"
-              name="picktime"
-              value={picktime}
-              onChange={(e) => handleChange(e)}
-            ></input>
-          </div>
-          
-          <div className="rounded mb-3 p-3 bg-danger text-white d-flex flex-column">
-            <h5 className="">Ending point</h5>
-            {/* <div className="row">
-                <div className="col-6"> */}
-            Which is your nearest station to end your trip?
-            <div>
-              <Map height={300} defaultCenter={[41.390, 2.154]} defaultZoom={11}><ZoomControl />
-                {bicistations.map((bici) => (
-                <Marker width={15} anchor={[+bici.lat,+bici.lon]} color={color} onClick={() =>handleClickOnMap2(bici)} key={bici.id}/>))}
-              </Map>
-            </div>
-            <input
-              name="ReturnStation"
-              value={ReturnStation}
-              onChange={(e) => handleChange(e)}
-              className="text-center mt-1"
-              placeholder="Click on a Station and it will give you the addres"
-            ></input>
-            {/* </div>
-                <div className="col-6"> */}
-            What time are you used to leave your bike?
-            <input
-              type="time"
-              className="text-center mt-1"
-              name="retime"
-              value={retime}
-              onChange={(e) => handleChange(e)}
-            ></input>
-          </div>
-
-          <div>
-            <button type="submit" className="btn btn-danger mt-3 m-auto">
-              Add your new path
-            </button>
-          </div>
+            <p className="px-4">
+              Which is your nearest station to <i className="bcb">start</i> your
+              trip?
+            </p>
+          </BiciPoint>
         </div>
-        
+        <div className="col-4 d-flex flex-column pb-2">
+          <BiciPoint
+            handleClickOnMap={(bici) => handleClickOnMap(bici, "ReturnStation")}
+            handleChange={handleChange}
+            station={ReturnStation}
+            time={retime}
+            name="retime"
+            stationName="ReturnStation"
+          >
+            <h5 className="">Ending point</h5>
+            <p className="px-4">
+              Which is your nearest station to <i className="bcb">end</i> your
+              trip?
+            </p>
+          </BiciPoint>
+        </div>
+        <div>
+          <button type="submit" className="btn btn-danger mt-3 m-auto">
+            Add your new path
+          </button>
+        </div>
       </form>
     </div>
   );

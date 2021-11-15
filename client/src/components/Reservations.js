@@ -5,12 +5,12 @@ export default function Reservations() {
   let [reservations, setReservations] = useState([]);
   let [error, setError] = useState(null);
 
-//a useEffect to display all the reservations everytime i enter into the profile
+  //a useEffect to display all the reservations everytime i enter into the profile
   useEffect(() => {
     getReservations();
   }, []);
 
-//the function to get the reservations from the database
+  //the function to get the reservations from the database
   const getReservations = () => {
     fetch("/myreservations")
       .then((response) => response.json())
@@ -38,7 +38,7 @@ export default function Reservations() {
     }
   };
 
-//to set a reservation as favourite
+  //to set a reservation as favourite
   const setToFavourite = async (reservation) => {
     try {
       const res = await fetch(`/myreservations/${reservation.id}`, {
@@ -47,7 +47,7 @@ export default function Reservations() {
       if (!res.ok) throw new Error("There was an error");
       const results = await res.json();
       getReservations();
-      } catch (err) {
+    } catch (err) {
       console.log(err);
     }
   };
@@ -77,30 +77,24 @@ export default function Reservations() {
                   <td>{reservation.picktime}</td>
                   <td>{reservation.ReturnStation}</td>
                   <td>{reservation.retime}</td>
-                  <td className="row align-center">
-                    <div class="col">{reservation.Favourite}</div>
-                    <div class="col">
-                      <button
-                        onClick={() => deleteReservation(reservation)}
-                        className="btn btnx btn-sm btn-danger mb-2"
-                      >
-                        x
-                      </button>
-                    </div>
-                    <div class="col">
-                      <label className="switch">
-                        <input
-                          type="checkbox"
-                          onClick={() => setToFavourite(reservation)}
-                          className={
-                            reservation.Favourite
-                              ? "bg-primary"
-                              : "bg-secondary"
-                          }
-                        />
-                        <span className="slider round"></span>
-                      </label>
-                    </div>
+                  <td>
+                    <button
+                      onClick={() => deleteReservation(reservation)}
+                      className="btn btnx btn-sm btn-danger mb-2"
+                    >
+                      x
+                    </button>
+
+                    <label className="switch">
+                      <input
+                        type="checkbox"
+                        onClick={() => setToFavourite(reservation)}
+                        className={
+                          reservation.Favourite ? "bg-primary" : "bg-secondary"
+                        }
+                      />
+                      <span className="slider round"></span>
+                    </label>
 
                     {/* <button
                       onClick={() => setToFavourite(reservation)}
@@ -109,7 +103,6 @@ export default function Reservations() {
                       F
                     </button> */}
 
-                    /*a toggle to set to favourite but with bootstrap, but not working*/
                     {/* <div className="form-check form-switch">
                       <input
                         type="checkbox"
