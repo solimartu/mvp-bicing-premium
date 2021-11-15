@@ -1,24 +1,27 @@
 import React, { useEffect, useState } from "react";
-import "react-date-range/dist/styles.css"; // main style file
-import "react-date-range/dist/theme/default.css"; // theme css file
-// import { Calendar } from "react-date-range";
-import { DateRange } from "react-date-range";
-import { addDays } from "date-fns";
-// import { Link } from "react-router-dom";
-// import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "react-date-range/dist/styles.css"; // main style file for the calendar
+import "react-date-range/dist/theme/default.css"; // theme css file for the calendar
+import { DateRange } from "react-date-range"; // library for the calendar
+import { addDays } from "date-fns"; // library for the calendar
+import { Map, Marker, ZoomControl } from "pigeon-maps"; // library to display the map
+import bicistations from "./bicistations.json"; // a list with all the bike stations in Barcelona
+
 
 export default function NewReservationForm() {
+  //useEffect to display the favourites into a select list
   useEffect(() => {
     getFavourites();
   }, []);
 
+// the function to get the favourites from the DB
   const getFavourites = () => {
     fetch("/myreservations/favourites")
       .then((response) => response.json())
       .then((favourites) => setFavs(favourites))
       .catch((error) => setError(error));
   };
-
+  
+  // my DB data
   let [newReservation, setNewReservation] = useState({
     PickUpStation: "",
     ReturnStation: "",
@@ -29,9 +32,37 @@ export default function NewReservationForm() {
     retime: "",
     daysrange: "",
   });
+
+  // to display the error -not sure if i'm using it or not really-
   let [error, setError] = useState(null);
+  // keeping the favourites data to be used then
   let [favs, setFavs] = useState([]);
 
+  const {
+    PickUpStation,
+    ReturnStation,
+    userId,
+    PathName,
+    Favourite,
+    picktime,
+    retime,
+    daysrange,
+  } = newReservation;
+
+// to set the range of days from the calendar
+  const [daysOfWeek, setDaysOfWeek] = useState({
+    selection: {
+      startDate: new Date(),
+      endDate: null,
+      key: "selection",
+    },
+  });
+
+// to put color to the marker for the map
+const [hue, setHue] = useState(0);
+const color = `hsl(${hue % 354}deg 70% 54%)`
+
+// every time that i put something on the inputs i see the changes. The range of days is to translate data from the calendar. I need to improve that showing just the days like (TUESDAY TO FRIDAY)
   const handleChange = (e) => {
     const value = e.target.value;
     const name = e.target.name;
@@ -43,18 +74,7 @@ export default function NewReservationForm() {
     }));
   };
 
-  const {
-    PickUpStation,
-
-    ReturnStation,
-
-    userId,
-    PathName,
-    Favourite,
-    picktime,
-    retime,
-    daysrange,
-  } = newReservation;
+//my function to add a new reservation after filling the fields (path name, the range in the calendar, starting point and time, ending point and time)
   const addNewReservation = async (event) => {
     event.preventDefault();
     try {
@@ -64,22 +84,28 @@ export default function NewReservationForm() {
         body: JSON.stringify(newReservation),
       });
       if (!res.ok) throw new Error("There was an error");
-      console.log(res, res.data);
       const data = await res.json();
-      //   getReservations();
-    } catch (err) {
+      } catch (err) {
       console.log(err);
     }
   };
-  const [daysOfWeek, setDaysOfWeek] = useState({
-    selection: {
-      startDate: new Date(),
-      endDate: null,
-      key: "selection",
-    },
-  });
-
-  //   const position = [51.505, -0.09];
+  
+  // the function to click a station and add its name into the input below
+  const handleClickOnMap = (bici) => {
+    const nameDeStation = bici.name;
+    setNewReservation((state) => ({
+      ...state,
+      PickUpStation: nameDeStation,
+    }));
+   };
+// the function to click a station and add its name into the input below (2) --i know i need to create a component, wait for it--
+   const handleClickOnMap2 = (bici) => {
+    const nameDeStation = bici.name;
+    setNewReservation((state) => ({
+      ...state,
+      ReturnStation: nameDeStation,
+    }));
+   }
 
   return (
     <div className="container">
@@ -101,7 +127,7 @@ export default function NewReservationForm() {
           <div className="d-flex flex-column justify-content-center">
             Or select one of your favs
             <select value={Favourite} className="m-auto mt-2 mb-2">
-              {favs &&
+              {favs.length>0 &&
                 favs.map((fav) => <option key={fav.id}>{fav.PathName}</option>)}
             </select>
           </div>
@@ -119,9 +145,7 @@ export default function NewReservationForm() {
               maxDate={addDays(new Date(), 10)}
               className="rounded"
               showDateDisplay={false}
-              rangeColors={["#dc3545", "#ffc107", "#fd7e14"]}
-              // disabledDates=
-            ></DateRange>
+              rangeColors={["#dc3545", "#ffc107", "#fd7e14"]}></DateRange> //the calendar
           </div>
         </div>
 
@@ -132,24 +156,17 @@ export default function NewReservationForm() {
                 <div className="col-6"> */}
             Which is your nearest station to start your trip?
             <div>
-              {/* <MapContainer center={position} zoom={13} scrollWheelZoom={false}>
-                <TileLayer
-                  attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <Marker position={position}>
-                  <Popup>
-                    A pretty CSS3 popup. <br /> Easily customizable.
-                  </Popup>
-                </Marker>
-              </MapContainer> */}
+              <Map height={300} defaultCenter={[41.390, 2.154]} defaultZoom={11}><ZoomControl />
+                {bicistations.map((bici) => (
+                <Marker width={15} anchor={[+bici.lat,+bici.lon]} color={color} onClick={() =>handleClickOnMap(bici)} key={bici.id}/>))}
+              </Map>
             </div>
             <input
               name="PickUpStation"
               value={PickUpStation}
               onChange={(e) => handleChange(e)}
               className="text-center mt-1 "
-              placeholder="Carrer de ..."
+              placeholder="Click on a Station and it will give you the address"
             ></input>
             What time are you used to grab your bike?
             <input
@@ -160,18 +177,24 @@ export default function NewReservationForm() {
               onChange={(e) => handleChange(e)}
             ></input>
           </div>
-
+          
           <div className="rounded mb-3 p-3 bg-danger text-white d-flex flex-column">
             <h5 className="">Ending point</h5>
             {/* <div className="row">
                 <div className="col-6"> */}
             Which is your nearest station to end your trip?
+            <div>
+              <Map height={300} defaultCenter={[41.390, 2.154]} defaultZoom={11}><ZoomControl />
+                {bicistations.map((bici) => (
+                <Marker width={15} anchor={[+bici.lat,+bici.lon]} color={color} onClick={() =>handleClickOnMap2(bici)} key={bici.id}/>))}
+              </Map>
+            </div>
             <input
               name="ReturnStation"
               value={ReturnStation}
               onChange={(e) => handleChange(e)}
               className="text-center mt-1"
-              placeholder="Carrer de ..."
+              placeholder="Click on a Station and it will give you the addres"
             ></input>
             {/* </div>
                 <div className="col-6"> */}
@@ -184,19 +207,14 @@ export default function NewReservationForm() {
               onChange={(e) => handleChange(e)}
             ></input>
           </div>
+
           <div>
             <button type="submit" className="btn btn-danger mt-3 m-auto">
               Add your new path
             </button>
           </div>
         </div>
-        {/* <Link
-          to="/reservations"
-          type="submit"
-          className="btn btn-outline-dark mt-3 m-auto"
-        >
-          Add your new path
-        </Link> */}
+        
       </form>
     </div>
   );

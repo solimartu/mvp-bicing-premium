@@ -1,7 +1,8 @@
 import { Link, Outlet } from "react-router-dom";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 export default function Profile() {
+  //a fake user by the moment
   const [user, setUser] = useState({
     firstName: "Solange",
     lastName: "Marturet",
@@ -9,6 +10,7 @@ export default function Profile() {
       "https://www.pngall.com/wp-content/uploads/5/Profile-PNG-Clipart.png",
     userName: "solimartu",
   });
+
   return (
     <div className="App container text-center mt-4 d-flex flex-column align-center">
       <header className="App-header pb-3">
@@ -16,7 +18,7 @@ export default function Profile() {
       </header>
       <section className="row d-flex justify-content-center">
         <div className="col-3">
-          <img src={user.profilePic} className="img-fluid"></img>
+          <img src={user.profilePic} className="img-fluid" alt="profile pic"></img>
         </div>
         <div className="col-9 d-flex flex-column justify-content-left">
           <h5 className="text-left">{user.firstName}</h5>

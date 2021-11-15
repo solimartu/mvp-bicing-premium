@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 
 export default function Reservations() {
+  //my data from the DB
   let [reservations, setReservations] = useState([]);
   let [error, setError] = useState(null);
 
+//a useEffect to display all the reservations everytime i enter into the profile
   useEffect(() => {
     getReservations();
   }, []);
 
+//the function to get the reservations from the database
   const getReservations = () => {
     fetch("/myreservations")
       .then((response) => response.json())
@@ -18,6 +21,8 @@ export default function Reservations() {
         setError(error);
       });
   };
+
+  //the fn to delete a reservation
   const deleteReservation = async (reservation) => {
     try {
       const res = await fetch(`/myreservations/${reservation.id}`, {
@@ -33,6 +38,7 @@ export default function Reservations() {
     }
   };
 
+//to set a reservation as favourite
   const setToFavourite = async (reservation) => {
     try {
       const res = await fetch(`/myreservations/${reservation.id}`, {
@@ -40,12 +46,8 @@ export default function Reservations() {
       });
       if (!res.ok) throw new Error("There was an error");
       const results = await res.json();
-
       getReservations();
-      //   setFavs((state) => ({...state,{reservation}}))
-      //   setFavs((state) => state.filter((e) => e.Favourite === 1));
-      //setReservations(data);
-    } catch (err) {
+      } catch (err) {
       console.log(err);
     }
   };
@@ -106,6 +108,8 @@ export default function Reservations() {
                     >
                       F
                     </button> */}
+
+                    /*a toggle to set to favourite but with bootstrap, but not working*/
                     {/* <div className="form-check form-switch">
                       <input
                         type="checkbox"

@@ -12,6 +12,7 @@ router.get("/", async function (req, res, next) {
   }
 });
 
+// POST for adding a new reservation
 router.post("/", async function (req, res, next) {
   try {
     const {
@@ -24,11 +25,7 @@ router.post("/", async function (req, res, next) {
       retime,
       daysrange,
     } = req.body;
-
     const query = `INSERT INTO myreservations (PickUpStation, ReturnStation, userId, PathName, Favourite, picktime, retime, daysrange) VALUES ("${PickUpStation}","${ReturnStation}","${userId}","${PathName}", 0, "${picktime}", "${retime}", "${daysrange}");`;
-
-    console.log(query);
-
     await db(query);
     res.send({ message: "insertion was OK" });
   } catch (err) {
@@ -36,6 +33,7 @@ router.post("/", async function (req, res, next) {
   }
 });
 
+// DELETE a reservation
 router.delete("/:id", async function (req, res, next) {
   try {
     const { id } = req.params;
@@ -48,6 +46,7 @@ router.delete("/:id", async function (req, res, next) {
   }
 });
 
+// PUT for setting a reservation as a favourite one
 router.put("/:id", async function (req, res, next) {
   try {
     const { id } = req.params;
@@ -62,12 +61,12 @@ router.put("/:id", async function (req, res, next) {
   }
 });
 
+// GET all the favourite reservations -used in the form-
 router.get("/favourites", async function (req, res, next) {
   try {
     const results = await db(
       `SELECT * FROM myreservations WHERE Favourite = 1;`
     );
-
     res.send(results.data);
   } catch (err) {
     res.status(500).send(err);
