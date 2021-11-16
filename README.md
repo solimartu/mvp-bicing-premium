@@ -53,7 +53,7 @@ An app to improve the way you find a bike near your house/work every day without
 
 ### Database Schema
 
-![DataBase Schema](database_schema.jpg)
+![DataBase Schema](database_schema.JPG)
 
 ## Future Features
 
