@@ -2,6 +2,12 @@
 
 An app to improve the way you find a bike near your house/work every day without risking to arrive late.
 
+## Used Technologies
+
+- Database: MySQL
+- Backend: NodeJS, Express
+- Frontend: React, JS
+
 ## Setup
 
 ### Dependencies
@@ -15,10 +21,12 @@ An app to improve the way you find a bike near your house/work every day without
 - Create a new database called premiumbicing: `create database premiumbicing`
 - Add a `.env` file to the project folder of this repository containing the MySQL authentication information for MySQL user. For example:
 
+```bash
   DB_HOST=localhost
   DB_USER=root
   DB_NAME=facebook
   DB_PASS=YOURPASSWORD
+```
 
 - Run `npm run migrate` in the project folder of this repository, in a new terminal window. This will create a table called 'myreservations' in your database.
 
