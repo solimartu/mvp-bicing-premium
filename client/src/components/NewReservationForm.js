@@ -98,7 +98,7 @@ export default function NewReservationForm() {
     <div className="container">
       <form
         onSubmit={(e) => addNewReservation(e)}
-        className=" row d-flex bg-dark rounded border text-white p-3 justify-content-center"
+        className=" row d-flex bg-dark rounded border text-white p-3 justify-content-center mt-4"
       >
         <div className="col-4">
           <div className="d-flex flex-column justify-content-center">
