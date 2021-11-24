@@ -24,7 +24,7 @@ An app to improve the way you find a bike near your house/work every day without
 ```bash
   DB_HOST=localhost
   DB_USER=root
-  DB_NAME=facebook
+  DB_NAME=premiumbicing
   DB_PASS=YOURPASSWORD
 ```
 
